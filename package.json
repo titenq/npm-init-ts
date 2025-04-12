@@ -1,6 +1,6 @@
 {
   "name": "npm-init-ts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -11,8 +11,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --tsconfig tsconfig.json",
     "start": "node dist/index.js"
   },
-  "keywords": ["NodeJS", "TypeScript", "CLI", "npm", "init", "template"],
-  "description": "CLI para inicializar projetos NodeJS com TypeScript",
+  "description": "CLI to scaffold Node.js projects with full TypeScript setup.",
   "homepage": "https://github.com/titenq/npm-init-ts#readme",
   "repository": {
     "type": "git",
@@ -31,5 +30,21 @@
   },
   "dependencies": {
     "dotenv": "^16.5.0"
-  }
+  },
+  "keywords": [
+    "cli",
+    "typescript",
+    "node",
+    "nodejs",
+    "starter",
+    "scaffold",
+    "tsup",
+    "tsx",
+    "dotenv",
+    "tsconfig",
+    "boilerplate",
+    "project-init",
+    "npm-init",
+    "project-generator"
+  ]
 }
