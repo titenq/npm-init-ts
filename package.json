@@ -1,20 +1,28 @@
 {
   "name": "npm-init-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "npm-init-ts": "./dist/index.js"
+    "npm-init-ts": "dist/index.js"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsup src/index.ts --format cjs,esm --dts --tsconfig tsconfig.json",
     "start": "node dist/index.js"
   },
-  "keywords": [],
+  "keywords": ["NodeJS", "TypeScript", "CLI", "npm", "init", "template"],
+  "description": "CLI para inicializar projetos NodeJS com TypeScript",
+  "homepage": "https://github.com/titenq/npm-init-ts#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/titenq/npm-init-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/titenq/npm-init-ts/issues"
+  },
   "author": "TitenQ <titenq@gmail.com> (https://github.com/titenq)",
   "license": "GPL-3.0",
-  "description": "",
   "devDependencies": {
     "@types/node": "^22.14.1",
     "tsup": "^8.4.0",

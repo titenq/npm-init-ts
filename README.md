@@ -1,4 +1,5 @@
 # npm-init-ts
+![](https://img.shields.io/github/stars/titenq/npm-init-ts.svg) ![](https://img.shields.io/github/forks/titenq/npm-init-ts.svg) ![](https://img.shields.io/github/issues/titenq/npm-init-ts.svg) 
 
 Create Node.js TypeScript projects in seconds!
 This CLI initializes a project with structure, TS, `.env`, `tsup`, `tsx`, and more!
