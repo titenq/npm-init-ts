@@ -1,9 +1,35 @@
-# PROJECT_NAME
+# Project Name
 
-## Scripts
+## Getting Started
 
-- `npm run dev`: Run the project in development mode
-- `npm run build`: Build the project
-- `npm run start`: Start the project
-- `npm run lint`: Lint the project
-- `npm run format`: Format the project
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run in development:
+
+```bash
+npm run dev
+```
+
+Edit the `.env` file in the project root as needed:
+
+```env
+NODE_ENV=development
+```
+
+Build the project:
+
+```bash
+npm run build
+```
+
+Run the built project:
+
+```bash
+npm run start
+```
+
+Environment variables are loaded and validated in `config/env.ts`.

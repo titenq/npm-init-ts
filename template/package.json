@@ -1,0 +1,27 @@
+{
+  "name": "your-package-name",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node dist/src/index.js",
+    "dev": "tsx --watch src/index.ts",
+    "format": "npm run lint:fix && prettier --write .",
+    "lint": "npm run format && oxlint && npm run type-check",
+    "lint:fix": "oxlint --fix -c oxlintrc.json",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "homepage": "https://github.com/<your_github_username>/your-package-name#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/<your_github_username>/your-package-name.git"
+  },
+  "bugs": {
+    "url": "https://github.com/<your_github_username>/your-package-name/issues"
+  },
+  "license": "GPL-3.0"
+}

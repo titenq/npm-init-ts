@@ -1,7 +1,6 @@
-import 'dotenv/config';
+import { NODE_ENV } from "../config/env";
 
-const { NODE_ENV } = process.env;
-const message: string = 'Hello World!';
+const message: string = `Hello World!
+Your current environment is: ${NODE_ENV || "development"}`;
 
 console.log(message);
-console.log(NODE_ENV);
