@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
-import { copyFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { cwd } from 'node:process';
 
@@ -14,82 +13,45 @@ const projectName = path.basename(cwd());
 
 const log = (msg: string) => console.log(`\x1b[32m✔\x1b[0m ${msg}`);
 
-const writeFile = (filePath: string, content: string) => {
-  fs.writeFileSync(path.join(cwd(), filePath), content);
-  log(`${filePath} created successfully!`);
-};
-
-const main = () => {
+const main = async () => {
+  log(`Initializing project ${projectName}...`);
+  
   execSync('npm init -y', { stdio: 'inherit' });
-  log(`Project ${projectName} created successfully!`);
+  log('npm initialized successfully!');
 
-  fs.mkdirSync('src', { recursive: true });
-  log('src directory created successfully!');
-
-  writeFile('src/index.ts', `import 'dotenv/config';
-
-const { NODE_ENV } = process.env;
-const message: string = 'Hello World!';
-
-console.log(message);
-console.log(NODE_ENV);
-`);
-
-  writeFile('.gitignore', `node_modules
-.env
-dist
-`);
-
-  writeFile('README.md', `# ${projectName}
-`);
+  const templatePath = path.join(__dirname, '..', 'template');
   
-  writeFile('.env', `NODE_ENV=development
-`);
+  fs.cpSync(templatePath, cwd(), { recursive: true });
+  log('Template files scaffolded successfully!');
+
+  const readmePath = path.join(cwd(), 'README.md');
+  const readmeContent = await readFile(readmePath, 'utf-8');
   
-  writeFile('.env.example', `NODE_ENV=
-`);
+  await writeFile(readmePath, readmeContent.replace('PROJECT_NAME', projectName));
 
-  copyFile(path.join(__dirname, '..', 'LICENSE.txt'), path.join(cwd(), 'LICENSE.txt'));
-  log('LICENSE.txt file copied successfully!');
-
+  log('Installing dependencies (this may take a moment)...');
   execSync('npm install -D typescript tsx tsup @types/node', { stdio: 'inherit' });
-  log('Development dependencies installed successfully!');
-
   execSync('npm install dotenv', { stdio: 'inherit' });
-  log('dotenv installed successfully!');
+  log('Dependencies installed successfully!');
 
-  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+  const pkgPath = path.join(cwd(), 'package.json');
+  const pkg = JSON.parse(await readFile(pkgPath, 'utf-8'));
+
   pkg.scripts = {
     dev: 'tsx watch src/index.ts',
     build: 'tsup src/index.ts --format cjs,esm --dts --tsconfig tsconfig.json',
     start: 'node dist/index.js',
+    test: 'echo "Error: no test specified" && exit 1',
   };
 
-  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-  log('package.json scripts edited successfully!');
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2));
 
-  writeFile('tsconfig.json', `{
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "rootDir": "src",
-    "outDir": "dist",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "src",
-    "paths": {
-      "@/*": ["*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}`);
-
-  log('Initial files created successfully!');
+  log('package.json scripts updated successfully!');
+  log('\nProject setup complete! Happy coding!');
+  log('Try running: npm run dev');
 };
 
-main();
+main().catch((err) => {
+  console.error('\x1b[31m✖\x1b[0m Error during initialization:', err);
+  process.exit(1);
+});
