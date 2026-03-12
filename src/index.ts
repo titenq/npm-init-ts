@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import path from 'node:path';
 import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { dirname, basename, join } from 'node:path';
 import { cwd } from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { styleText } from 'node:util';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
+const projectName = basename(cwd());
 
-const projectName = path.basename(cwd());
-
-const log = (msg: string) => console.log(`\x1b[32m✔\x1b[0m ${msg}`);
+const log = (msg: string) => console.log(`${styleText('green', '✔')} ${msg}`);
 
 const main = async () => {
   log(`Initializing project ${projectName}...`);
@@ -19,12 +19,12 @@ const main = async () => {
   execSync('npm init -y', { stdio: 'inherit' });
   log('npm initialized successfully!');
 
-  const templatePath = path.join(__dirname, '..', 'template');
+  const templatePath = join(__dirname, '..', 'template');
   
   fs.cpSync(templatePath, cwd(), { recursive: true });
   log('Template files scaffolded successfully!');
 
-  const readmePath = path.join(cwd(), 'README.md');
+  const readmePath = join(cwd(), 'README.md');
   const readmeContent = await readFile(readmePath, 'utf-8');
   
   await writeFile(readmePath, readmeContent.replace('PROJECT_NAME', projectName));
@@ -34,7 +34,7 @@ const main = async () => {
   execSync('npm install dotenv', { stdio: 'inherit' });
   log('Dependencies installed successfully!');
 
-  const pkgPath = path.join(cwd(), 'package.json');
+  const pkgPath = join(cwd(), 'package.json');
   const pkg = JSON.parse(await readFile(pkgPath, 'utf-8'));
 
   pkg.scripts = {
