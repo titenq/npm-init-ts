@@ -46,17 +46,21 @@ After generation, edit `<your_github_username>` in these `package.json` fields:
 
 ```bash
 📦 your-project/
+├── node_modules/
 ├── src/
+│   ├── config/
+│   │   └── env.ts
 │   └── index.ts
-│   └── config/
-│       └── env.ts
 ├── .env
 ├── .env.example
 ├── .gitignore
+├── .prettierrc
 ├── LICENSE.txt
+├── oxlintrc.json
+├── package-lock.json
 ├── package.json
-├── tsconfig.json
 └── README.md
+├── tsconfig.json
 ```
 
 ## Generated Scripts
