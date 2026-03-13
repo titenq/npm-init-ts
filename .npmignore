@@ -1,0 +1,7 @@
+/src
+/tsconfig.json
+/.prettierrc
+/oxlintrc.json
+/.env
+/.env.example
+/package-lock.json
