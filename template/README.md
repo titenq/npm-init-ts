@@ -32,4 +32,4 @@ Run the built project:
 npm run start
 ```
 
-Environment variables are loaded and validated in `config/env.ts`.
+Environment variables are loaded and validated in `src/config/env.ts`.

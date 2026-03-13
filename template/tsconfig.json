@@ -7,11 +7,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "dist",
     "types": ["node"]
   },
-  "include": ["src", "config"],
+  "include": ["src"],
   "exclude": ["dist", "node_modules"],
   "tsc-alias": {
     "resolveFullPaths": true

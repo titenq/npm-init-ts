@@ -19,13 +19,14 @@ Then enter a value for `Project Name`. The CLI will:
 - create a folder using the slugified project name
 - use the exact value you typed in the generated `README.md`
 - use the slug for `package.json` `name` and GitHub URLs
+- leave `<your_github_username>` in `package.json` for you to replace manually
 
 ## What It Generates
 
 - Copies a complete `package.json` template
 - Creates the structure:
   - `src/index.ts` with central env loading
-  - `config/env.ts` using `loadEnvFile()`
+  - `src/config/env.ts` using `loadEnvFile()`
   - `.gitignore`, `README.md`, `.env`, `.env.example`
   - `LICENSE.txt`
 - Installs development dependencies:
@@ -35,14 +36,20 @@ Then enter a value for `Project Name`. The CLI will:
 - Fills `name` and GitHub placeholder fields in `package.json`
 - Creates `.env` in the project root
 
+After generation, edit `<your_github_username>` in these `package.json` fields:
+
+- `homepage`
+- `repository.url`
+- `bugs.url`
+
 ## Final Structure
 
 ```bash
 📦 your-project/
 ├── src/
 │   └── index.ts
-├── config/
-│   └── env.ts
+│   └── config/
+│       └── env.ts
 ├── .env
 ├── .env.example
 ├── .gitignore

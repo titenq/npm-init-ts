@@ -11,7 +11,8 @@ import inquirer from "inquirer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const projectTitlePlaceholder = "Project Name";
+const projectPromptMessage = "Project Name:";
+const projectNameExample = "My App";
 const packageNamePlaceholder = "your-package-name";
 const defaultEnvContent = "NODE_ENV=development\n";
 
@@ -32,7 +33,8 @@ const main = async () => {
       {
         type: "input",
         name: "projectName",
-        message: projectTitlePlaceholder,
+        message: projectPromptMessage,
+        default: projectNameExample,
         validate: (value: string) => {
           const trimmedValue = value.trim();
           const projectSlug = slugifyProjectName(trimmedValue);
@@ -70,7 +72,7 @@ const main = async () => {
 
     await writeFile(
       readmePath,
-      readmeContent.split(projectTitlePlaceholder).join(projectName.trim()),
+      readmeContent.split("Project Name").join(projectName.trim()),
     );
 
     const envPath = join(targetPath, ".env");
@@ -94,12 +96,12 @@ const main = async () => {
     log("Installing dependencies (this may take a moment)...");
 
     execSync(
-      "npm install -D typescript tsx @types/node prettier @prettier/plugin-oxc oxlint tsc-alias",
+      "npm install -D --silent --no-audit --no-fund typescript tsx @types/node prettier @prettier/plugin-oxc oxlint tsc-alias",
       { cwd: targetPath, stdio: "inherit" },
     );
 
     log("Dependencies installed successfully!");
-    log("\nProject setup complete! Happy coding!");
+    log("Project setup complete! Happy coding!");
     log(`Try running: cd ${projectSlug} && npm run dev`);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
