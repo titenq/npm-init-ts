@@ -35,7 +35,6 @@ const main = async () => {
         name: "projectName",
         message: projectPromptMessage,
         default: projectNameExample,
-        prefill: "editable",
         validate: (value: string) => {
           const trimmedValue = value.trim();
           const projectSlug = slugifyProjectName(trimmedValue);
@@ -52,7 +51,6 @@ const main = async () => {
         },
       },
     ]);
-
     const projectSlug = slugifyProjectName(projectName);
     const targetPath = join(cwd(), projectSlug);
 
@@ -66,6 +64,7 @@ const main = async () => {
     const templatePath = join(__dirname, "..", "template");
 
     fs.cpSync(templatePath, targetPath, { recursive: true });
+
     log("Template files scaffolded successfully!");
 
     const readmePath = join(targetPath, "README.md");
@@ -77,6 +76,7 @@ const main = async () => {
     );
 
     const envPath = join(targetPath, ".env");
+
     await writeFile(envPath, defaultEnvContent);
 
     const pkgPath = join(targetPath, "package.json");
@@ -107,6 +107,7 @@ const main = async () => {
     const message = error instanceof Error ? error.message : String(error);
 
     console.error("\x1b[31m✖\x1b[0m Error during initialization:", message);
+
     process.exit(1);
   }
 };
