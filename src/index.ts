@@ -1,102 +1,114 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import path from 'node:path';
-import { execSync } from 'node:child_process';
-import { copyFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import { cwd } from 'node:process';
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { cwd } from "node:process";
+import { fileURLToPath } from "node:url";
+import { styleText } from "node:util";
+
+import inquirer from "inquirer";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
+const projectPromptMessage = "Project Name:";
+const projectNameExample = "My App";
+const packageNamePlaceholder = "your-package-name";
+const defaultEnvContent = "NODE_ENV=development\n";
 
-const projectName = path.basename(cwd());
+const log = (msg: string) => console.log(`${styleText("green", "✔")} ${msg}`);
 
-const log = (msg: string) => console.log(`\x1b[32m✔\x1b[0m ${msg}`);
+const slugifyProjectName = (value: string): string =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-const writeFile = (filePath: string, content: string) => {
-  fs.writeFileSync(path.join(cwd(), filePath), content);
+const main = async () => {
+  try {
+    const { projectName } = await inquirer.prompt<{ projectName: string }>([
+      {
+        type: "input",
+        name: "projectName",
+        message: projectPromptMessage,
+        default: projectNameExample,
+        prefill: "editable",
+        validate: (value: string) => {
+          const trimmedValue = value.trim();
+          const projectSlug = slugifyProjectName(trimmedValue);
 
-  log(`${filePath} created successfully!`);
-};
+          if (!trimmedValue) {
+            return "Project name is required.";
+          }
 
-const main = () => {
-  execSync('npm init -y', { stdio: 'inherit' });
-  log(`Project ${projectName} created successfully!`);
+          if (!projectSlug) {
+            return "Project name must contain letters or numbers.";
+          }
 
-  fs.mkdirSync('src', { recursive: true });
-  log('src directory created successfully!');
-  
-  fs.mkdirSync('src/controllers', { recursive: true });
-  log('src/controllers directory created successfully!');
-  
-  fs.mkdirSync('src/helpers', { recursive: true });
-  log('src/helpers directory created successfully!');
-  
-  fs.mkdirSync('src/interfaces', { recursive: true });
-  log('src/interfaces directory created successfully!');
-    
-  fs.mkdirSync('src/routes', { recursive: true });
-  log('src/routes directory created successfully!');
+          return true;
+        },
+      },
+    ]);
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'index.ts'), path.join(cwd(), 'src', 'index.ts'));
-  log('index.ts file copied successfully!');
+    const projectSlug = slugifyProjectName(projectName);
+    const targetPath = join(cwd(), projectSlug);
 
-  copyFile(path.join(__dirname, '..', 'template', '.gitignore'), path.join(cwd(), '.gitignore'));
-  log('.gitignore file copied successfully!');
+    if (fs.existsSync(targetPath)) {
+      throw new Error(`Directory "${projectSlug}" already exists.`);
+    }
 
-  copyFile(path.join(__dirname, '..', 'template', '.env'), path.join(cwd(), '.env'));
-  log('.env file copied successfully!');
+    fs.mkdirSync(targetPath);
+    log(`Creating project ${projectName} in ${projectSlug}...`);
 
-  copyFile(path.join(__dirname, '..', 'template', '.env.example'), path.join(cwd(), '.env.example'));
-  log('.env.example file copied successfully!');
+    const templatePath = join(__dirname, "..", "template");
 
-  copyFile(path.join(__dirname, '..', 'template', 'LICENSE.txt'), path.join(cwd(), 'LICENSE.txt'));
-  log('LICENSE.txt file copied successfully!');
+    fs.cpSync(templatePath, targetPath, { recursive: true });
+    log("Template files scaffolded successfully!");
 
-  copyFile(path.join(__dirname, '..', 'template', 'tsconfig.json'), path.join(cwd(), 'tsconfig.json'));
-  log('tsconfig.json file copied successfully!');
+    const readmePath = join(targetPath, "README.md");
+    const readmeContent = await readFile(readmePath, "utf-8");
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'controllers', 'pingController.ts'), path.join(cwd(), 'src', 'controllers', 'pingController.ts'));
-  log('pingController.ts file copied successfully!');
+    await writeFile(
+      readmePath,
+      readmeContent.split("Project Name").join(projectName.trim()),
+    );
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'helpers', 'errorHandler.ts'), path.join(cwd(), 'src', 'helpers', 'errorHandler.ts'));
-  log('errorHandler.ts file copied successfully!');
+    const envPath = join(targetPath, ".env");
+    await writeFile(envPath, defaultEnvContent);
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'interfaces', 'errorInterface.ts'), path.join(cwd(), 'src', 'interfaces', 'errorInterface.ts'));
-  log('errorInterface.ts file copied successfully!');
+    const pkgPath = join(targetPath, "package.json");
+    const pkg = JSON.parse(await readFile(pkgPath, "utf-8"));
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'interfaces', 'pingInterface.ts'), path.join(cwd(), 'src', 'interfaces', 'pingInterface.ts'));
-  log('pingInterface.ts file copied successfully!');
+    pkg.name = projectSlug;
+    pkg.repository.url = pkg.repository.url
+      .split(packageNamePlaceholder)
+      .join(projectSlug);
+    pkg.bugs.url = pkg.bugs.url.split(packageNamePlaceholder).join(projectSlug);
+    pkg.homepage = pkg.homepage.split(packageNamePlaceholder).join(projectSlug);
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'routes', 'indexRoute.ts'), path.join(cwd(), 'src', 'routes', 'indexRoute.ts'));
-  log('indexRoute.ts file copied successfully!');
+    await writeFile(pkgPath, JSON.stringify(pkg, null, 2));
 
-  copyFile(path.join(__dirname, '..', 'template', 'src', 'routes', 'pingRoute.ts'), path.join(cwd(), 'src', 'routes', 'pingRoute.ts'));
-  log('pingRoute.ts file copied successfully!');
+    log("package.json configured successfully!");
+    log(".env created successfully!");
+    log("Installing dependencies (this may take a moment)...");
 
-  writeFile('README.md', `# ${projectName}
-  `);
+    execSync(
+      "npm install -D --silent --no-audit --no-fund typescript tsx @types/node prettier @prettier/plugin-oxc oxlint tsc-alias",
+      { cwd: targetPath, stdio: "inherit" },
+    );
 
-  execSync('npm install -D typescript tsx tsup @types/node', { stdio: 'inherit' });
-  log('Development dependencies installed successfully!');
+    log("Dependencies installed successfully!");
+    log("Project setup complete! Happy coding!");
+    log(`Try running: cd ${projectSlug} && npm run dev`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
 
-  execSync('npm install dotenv fastify @fastify/cors @fastify/cookie @fastify/jwt zod fastify-type-provider-zod', { stdio: 'inherit' });
-  log('dotenv installed successfully!');
-
-  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-
-  pkg.scripts = {
-    dev: 'tsx watch src/index.ts',
-    build: 'tsup src/index.ts --format cjs,esm --dts --tsconfig tsconfig.json',
-    start: 'node dist/index.js',
-  };
-
-  pkg.type = "module";
-
-  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-
-  log('package.json scripts edited successfully!');
-  log('Initial files created successfully!');
+    console.error("\x1b[31m✖\x1b[0m Error during initialization:", message);
+    process.exit(1);
+  }
 };
 
 main();
