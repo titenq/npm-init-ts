@@ -2,11 +2,11 @@
   "name": "your-package-name",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "tsx --watch src/index.ts",
     "format": "npm run lint:fix && prettier --write .",
     "lint": "npm run format && oxlint && npm run type-check",
