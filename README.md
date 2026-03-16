@@ -78,3 +78,10 @@ NODE_ENV=development
 ## License
 
 This project automatically adds a `LICENSE.txt` to your project under `GPL-3.0`.
+
+
+<!-- Stargazers generated automatically with npx @titenq/stargazers -->
+## ⭐ Stargazers
+
+[<img src="https://avatars.githubusercontent.com/u/108964822?v=4&s=80" width="80" height="80" alt="eriveltondasilva" title="eriveltondasilva" />](https://github.com/eriveltondasilva)
+
