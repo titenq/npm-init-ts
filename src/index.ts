@@ -15,6 +15,7 @@ const projectPromptMessage = "Project Name:";
 const projectNameExample = "My App";
 const packageNamePlaceholder = "your-package-name";
 const defaultEnvContent = "NODE_ENV=development\n";
+const defaultGitignoreContent = "node_modules\n.env\ndist\n";
 
 const log = (msg: string) => console.log(`${styleText("green", "✔")} ${msg}`);
 
@@ -76,8 +77,10 @@ const main = async () => {
     );
 
     const envPath = join(targetPath, ".env");
-
     await writeFile(envPath, defaultEnvContent);
+
+    const gitignorePath = join(targetPath, ".gitignore");
+    await writeFile(gitignorePath, defaultGitignoreContent);
 
     const pkgPath = join(targetPath, "package.json");
     const pkg = JSON.parse(await readFile(pkgPath, "utf-8"));
